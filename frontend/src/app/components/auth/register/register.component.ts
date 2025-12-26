@@ -1,11 +1,33 @@
+// src/app/components/auth/register/register.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+
+// Angular Material
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSnackBarModule
+  ],
   template: `
     <div class="register-container">
       <mat-card class="register-card">
@@ -24,17 +46,17 @@ import { AuthService } from '../../../services/auth.service';
                 <mat-label>First Name</mat-label>
                 <input matInput formControlName="firstName">
                 <mat-icon matPrefix>person</mat-icon>
-                <mat-error *ngIf="registerForm.get('firstName')?.hasError('required')">
-                  First name is required
-                </mat-error>
+                @if (registerForm.get('firstName')?.hasError('required')) {
+                  <mat-error>First name is required</mat-error>
+                }
               </mat-form-field>
               
               <mat-form-field appearance="outline" class="half-width">
                 <mat-label>Last Name</mat-label>
                 <input matInput formControlName="lastName">
-                <mat-error *ngIf="registerForm.get('lastName')?.hasError('required')">
-                  Last name is required
-                </mat-error>
+                @if (registerForm.get('lastName')?.hasError('required')) {
+                  <mat-error>Last name is required</mat-error>
+                }
               </mat-form-field>
             </div>
             
@@ -42,12 +64,12 @@ import { AuthService } from '../../../services/auth.service';
               <mat-label>Email</mat-label>
               <input matInput formControlName="email" type="email" placeholder="example@email.com">
               <mat-icon matPrefix>email</mat-icon>
-              <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
-                Email is required
-              </mat-error>
-              <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
-                Please enter a valid email
-              </mat-error>
+              @if (registerForm.get('email')?.hasError('required')) {
+                <mat-error>Email is required</mat-error>
+              }
+              @if (registerForm.get('email')?.hasError('email')) {
+                <mat-error>Please enter a valid email</mat-error>
+              }
             </mat-form-field>
             
             <mat-form-field appearance="outline" class="full-width">
@@ -57,12 +79,12 @@ import { AuthService } from '../../../services/auth.service';
               <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
                 <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
               </button>
-              <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
-                Password is required
-              </mat-error>
-              <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
-                Password must be at least 6 characters
-              </mat-error>
+              @if (registerForm.get('password')?.hasError('required')) {
+                <mat-error>Password is required</mat-error>
+              }
+              @if (registerForm.get('password')?.hasError('minlength')) {
+                <mat-error>Password must be at least 6 characters</mat-error>
+              }
             </mat-form-field>
             
             <mat-form-field appearance="outline" class="full-width">
@@ -72,12 +94,12 @@ import { AuthService } from '../../../services/auth.service';
               <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword">
                 <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
               </button>
-              <mat-error *ngIf="registerForm.get('confirmPassword')?.hasError('required')">
-                Please confirm your password
-              </mat-error>
-              <mat-error *ngIf="registerForm.hasError('passwordMismatch')">
-                Passwords do not match
-              </mat-error>
+              @if (registerForm.get('confirmPassword')?.hasError('required')) {
+                <mat-error>Please confirm your password</mat-error>
+              }
+              @if (registerForm.hasError('passwordMismatch')) {
+                <mat-error>Passwords do not match</mat-error>
+              }
             </mat-form-field>
             
             <div class="button-container">
@@ -225,7 +247,7 @@ export class RegisterComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
-    }, { validator: this.passwordMatchValidator });
+    }, { validators: this.passwordMatchValidator });
   }
 
   ngOnInit(): void {

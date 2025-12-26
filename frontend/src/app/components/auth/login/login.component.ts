@@ -1,18 +1,40 @@
+// src/app/components/auth/login/login.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+
+// Angular Material
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSnackBarModule
+  ],
   template: `
     <div class="login-container">
       <mat-card class="login-card">
         <mat-card-header>
           <mat-card-title>
             <mat-icon class="title-icon">cloud</mat-icon>
-            Welcome to DriveApp
+            DriveApp Login
           </mat-card-title>
           <mat-card-subtitle>Secure file sharing platform</mat-card-subtitle>
         </mat-card-header>
@@ -66,13 +88,13 @@ import { AuthService } from '../../../services/auth.service';
                 [disabled]="loading"
                 class="full-width google-btn">
                 <img src="https://www.google.com/favicon.ico" alt="Google" class="google-icon">
-                Login with Google
+                Sign in with Google
               </button>
             </div>
             
             <div class="register-link">
               Don't have an account? 
-              <a routerLink="/register" class="link">Create one here</a>
+              <a routerLink="/register" class="link">Register here</a>
             </div>
           </form>
         </mat-card-content>
@@ -164,13 +186,11 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading = false;
   hidePassword = true;
-  returnUrl = '';
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute,
     private snackBar: MatSnackBar
   ) {
     this.loginForm = this.formBuilder.group({
@@ -180,11 +200,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Récupérer l'URL de retour depuis les query params
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-    
     if (this.authService.isLoggedIn()) {
-      this.router.navigate([this.returnUrl]);
+      this.router.navigate(['/dashboard']);
     }
   }
 
@@ -193,11 +210,11 @@ export class LoginComponent implements OnInit {
       this.loading = true;
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          this.router.navigate([this.returnUrl]);
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.loading = false;
-          let errorMessage = 'Login failed. Please check your credentials.';
+          let errorMessage = 'Login failed. Please try again.';
           
           if (error.error && typeof error.error === 'string') {
             errorMessage = error.error;
@@ -216,7 +233,6 @@ export class LoginComponent implements OnInit {
 
   loginWithGoogle(): void {
     this.loading = true;
-    // Redirection vers l'endpoint OAuth2 de Spring Boot
     window.location.href = 'http://localhost:8080/api/oauth2/authorization/google';
   }
 }

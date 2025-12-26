@@ -12,41 +12,33 @@ public class AccessRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "requester_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
 
-    @ManyToOne
-    @JoinColumn(name = "file_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "file_id", nullable = false)
     private File file;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;
 
+    @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Column(nullable = false)
     private LocalDateTime requestedAt;
+
     private LocalDateTime respondedAt;
 
     @PrePersist
     protected void onCreate() {
         requestedAt = LocalDateTime.now();
-    }
-
-    public void setRequester(User requester) {
-    }
-
-    public void setFile(File file) {
-    }
-
-    public void setMessage(String message) {
-    }
-
-    public void setStatus(RequestStatus requestStatus) {
     }
 
     public enum RequestStatus {
